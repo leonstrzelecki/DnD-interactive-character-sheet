@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karta Postaci D&D</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: left;
+            align-items: flex-start;
+            padding-top: 20px;
+            min-width: 1200px;
+        }
+        .subcontainer {
+            flex: 1;
+            display: flex;
+            flex-direction: column; 
+            align-items: flex-start; 
+        }
+
+        .subercontainer {
+            display: flex; /* Ustawia elementy w jednej linii */
+            margin-bottom: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .num-field{
+            /*-moz-appearance: textfield;*/ /* Firefox */
+            margin-right: 10px;
+        }
+        .num-field::-webkit-outer-spin-button,
+        .num-field::-webkit-inner-spin-button {
+            -webkit-appearance: none; /* Chrome, Safari, Edge, Opera */
+            margin: 0;
+        }
+
+        .base-stats-field {
+            width: 20px;
+        }
+        .hp-field{
+            width: 30px;
+        }
+        .exp-field {
+            width: 100px;  
+        }
+        
+
+        .speed-field {
+            width: 20px;
+        }
+
+        .base-stats-label {
+            width: 90px;
+            display: inline-block;
+        }
+        .prof-label {
+            width: 130px;
+            display: inline-block;
+        }
+
+        .prof-mod-span{
+            width: 154px;
+            display: inline-block;
+        }
+        .base-stats-span {
+            width: 100px;
+            display: inline-block;
+        }
+
+        .base-stats-line{
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .base-stats-line{
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .progress-container {
+            width: 150px;
+            height: 18px;
+            background-color: #2d2d2d; /* Ciemniejszy kolor */
+            border-radius: 9px; /* Zaokrąglone rogi */
+            overflow: hidden;
+            position: relative; /* Ustawienie relatywne dla pozycjonowania absolutnego elementów wewnątrz */
+            display: inline-block; /* Ustawienie elementu obok */
+            vertical-align: middle;
+        }
+        .xp-container {
+            margin-left: 20px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1; /* Umieszczenie paska postępu pod spanem */
+        }
+
+        .hp-bar{
+            background-color: #4caf50; /* Zielony kolor paska postępu */
+        }
+        .xp-bar{
+            background-color: #2c42a2; 
+        }
+
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            line-height: 18px; /* Centrowanie tekstu w pionie */
+            color: white;
+            z-index: 2; /* Umieszczenie tekstu na wierzchu wszystkich elementów */
+        }
+    </style>
+    <script>
+        const basicStats = ["str","dex","con","int","wis","chr"]
+        const lvl_prop = [
+            [2, 300],
+            [2, 900],
+            [2, 2700],
+            [2, 6500],
+            [3, 14000],
+            [3, 23000],
+            [3, 34000],
+            [3, 48000],
+            [4, 64000],
+            [4, 85000],
+            [4, 100000],
+            [4, 120000],
+            [5, 140000],
+            [5, 165000],
+            [5, 195000],
+            [5, 225000],
+            [6, 265000],
+            [6, 305000],
+            [6, 355000],
+            [6, 'MAX']]
+        const classProp = {
+            brb: [12, 7],   // Barbarian
+            brd: [8, 5],    // Bard
+            clr: [8, 5],    // Cleric
+            drd: [8, 5],    // Druid
+            fgt: [10, 6],   // Fighter
+            mnk: [8, 5],    // Monk
+            pld: [10, 6],   // Paladin
+            rng: [10, 6],   // Ranger
+            rou: [8, 5],    // Rogue
+            src: [6, 4],    // Sorcerer
+            wrl: [8, 5],    // Warlock
+            wiz: [6, 4]     // Wizard
+        }
+
+        function countMaxHP(classId){
+            var baseHP = classProp[classId][0] 
+            var incrHP = classProp[classId][1]
+            var cur_lvl = parseInt(document.getElementById('char_lvl').textContent)
+            var con_bonus = parseInt(document.getElementById('con_bonus').textContent)
+            var hpSpan = document.getElementById('healtText')
+            
+            var maxHP = baseHP + cur_lvl *(incrHP + con_bonus) - incrHP
+            hpSpan.textContent = hpSpan.textContent.replace(/\/.*$/, "/" + maxHP)
+        }
+
+        function countProf(){
+            var statSpan = document.getElementById('prof_bonus');
+            var lvl = parseInt(document.getElementById('char_lvl').textContent);
+            var bonus = "+" + lvl_prop[lvl-1][0];
+            statSpan.textContent = bonus;
+            updateValues()
+        }
+
+        function countBonus(element){
+            var stat = document.getElementById(element.dataset.parent).value;
+            var bonus = Math.floor((stat - 10) / 2);
+            var id = element.id.split("_");
+            if (document.getElementById(id[0]).checked == true){
+                bonus += parseInt(document.getElementById('prof_bonus').textContent);
+            }
+            var bonusText = bonus >= 0 ? `+${bonus}` : bonus;
+            element.textContent = bonusText;
+            if (element.id == 'dex_bonus'){
+                document.getElementById('init_bonus').textContent = bonusText;
+            }
+        }
+
+        function updateValues() {
+            //console.log('executed updateValues')
+
+            var toValidate = document.getElementsByClassName("base-stats-field");
+            Array.from(toValidate).forEach(elmt => validateBaseStat(elmt));
+
+            var toUpdate = document.getElementsByClassName("bonus-span");
+            Array.from(toUpdate).forEach(elmt => countBonus(elmt));
+
+            countMaxHP(document.getElementById('char_class').value)
+        }
+        
+        function saveToJSON() {
+            //get data to export
+            //to do exp, other stats, class, race, bg
+            var export_content = {};
+            export_content.char_name = document.getElementById('char_name').value;
+            basicStats.forEach(id => export_content[id] = document.getElementById(id).value);
+            
+            //export data do json
+            const jsonString = JSON.stringify(export_content, null, 2);
+            const blob = new Blob([jsonString], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = export_content.char_name + "_save.json";
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function addXP(){
+            var lvl_span = document.getElementById('char_lvl');
+            var prg_txt = document.getElementById('progressText');
+            var xp_input = document.getElementById('exp_increment');
+            var xp_inc = parseInt(xp_input.value);
+            var cur_lvl = parseInt(lvl_span.textContent);
+            var cur_xp = parseInt(prg_txt.textContent.split('/')[0]);
+            var max_xp = lvl_prop[cur_lvl-1][1];
+            cur_xp += xp_inc;
+            if (cur_xp >= max_xp){
+                while (cur_xp >= max_xp){
+                    max_xp = lvl_prop[cur_lvl][1];
+                    cur_lvl += 1;
+                }
+                lvl_span.textContent = cur_lvl;
+                countProf();
+            }
+            setBarWidth('progressBar', cur_xp, max_xp);
+            prg_txt.textContent = cur_xp + "/" + max_xp;
+            xp_input.value = max_xp-cur_xp;
+        }
+        
+        function setBarWidth(id,cur,max){
+            var element = document.getElementById(id)
+            var proc = String(cur*100 / max) +"%";
+            element.style.width = proc;
+        }
+
+        function validateBaseStat(element){
+            var stat = element.value;
+            if (stat>20){
+                element.value = 20;
+            } else if (stat<0){
+                element.value = 0;
+            }     
+        }
+        
+        function addHP(bool,max = false){
+            var hpSpan = document.getElementById('healtText')
+            var cur_hp = parseInt(hpSpan.textContent.split("/")[0])
+            var max_hp = parseInt(hpSpan.textContent.split("/")[1])
+            var hpInput = document.getElementById('hp-input')
+            var hpValue = hpInput.value
+            if (max == true){
+                hpValue = max_hp
+            }
+            else if (bool==false){
+                hpValue = -hpValue
+            }
+            cur_hp += Number(hpValue)
+
+            if (cur_hp <= -max_hp){
+                alert("umarłeś")
+            }
+            else if(cur_hp <=0){
+                alert("TODO WALKA O ŻYCIE")
+            }
+            else if(cur_hp > max_hp){
+                cur_hp = max_hp
+            }
+            hpSpan.textContent=hpSpan.textContent.replace(/^[^\/]*/, cur_hp )
+            hpInput.value = "1"
+            setBarWidth('healtBar', cur_hp, max_hp)
+
+        }
+    </script>
+</head>
+<body>
+    <div class="container" id="container1">
+        <div class="subcontainer">
+            <div class="subercontainer">
+                <label class="base-stats-label" for="char_name" >Name: </label>
+                <input type="text" id="char_name">
+            </div>
+            <div class="subercontainer">
+                <span class="base-stats-label">Race: </span>
+                <input type="text" id="char_race">
+            </div>
+            <div class="subercontainer">
+                <label for="char_class" class="base-stats-label">Class: </label>
+                <select id="char_class" onchange="countMaxHP(this.value)">
+                    <option value="brb" selected>Barbarian</option>
+                    <option value="brd">Bard</option>
+                    <option value="clr">Cleric</option>
+                    <option value="drd">Druid</option>
+                    <option value="fgt">Fighter</option>
+                    <option value="mnk">Monk</option>
+                    <option value="pld">Paladin</option>
+                    <option value="rng">Ranger</option>
+                    <option value="rou">Rogue</option>
+                    <option value="src">Sorcerer</option>
+                    <option value="wrl">Warlock</option>
+                    <option value="wiz">Wizard</option>
+                </select>
+            </div>
+            <div class="subercontainer">
+                <label class="base-stats-label" for="char_bg" >Background: </label>
+                <input type="text" id="char_bg">
+            </div>
+            <div class="subercontainer">
+                <button onclick="saveToJSON()">Save</button>
+                <button >Load</button>
+            </div>
+        </div>
+        <div class="subcontainer">
+            <div class="subercontainer">
+                <span class="base-stats-label">Level: </span>
+                <span id="char_lvl">1</span>
+            </div>
+            <div class="subercontainer">
+                <span display="inline-block" margin-right="40px">XP:</span>
+                <div class="progress-container xp-container">
+                    <div class="progress-bar xp-bar" id="progressBar"></div>
+                    <span class="progress-text" id="progressText">0/300</span>
+                </div>
+            </div>
+            <div class="subercontainer">
+                <input type="number" class="exp-field num-field" id="exp_increment" value="300"><button onclick="addXP()">Add XP</button>
+            </div>
+        </div>
+        <div class="subcontainer">
+            <div class="subercontainer">
+                <span>HIT Points</span>
+            </div>
+
+            <div class="subercontainer">
+                <div class="progress-container">
+                    <div class="progress-bar hp-bar" id="healtBar"></div>
+                    <span class="progress-text" id="healtText">0/300</span>
+                </div>
+            </div>
+            <div class="subercontainer">
+                <input type="number" id="hp-input" class="hp-field num-field" value="1">
+                <button onclick="addHP(false)">DMG</button>
+                <button onclick="addHP(true)">HEAL</button>
+                <button onclick="addHP(true,true)">MAX</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" id="container2">
+        <div class="subcontainer">
+            <h4>Basic Stats</h4>
+            <form>
+                <div class="base-stats-line">
+                    <label class="base-stats-label" for="str">Strength:</label>
+                    <input type="number" id="str" class="base-stats-field num-field" value="10" oninput="updateValues()">
+                    <span class="base-stats-span">Ability Bonus: </span>
+                    <span class="bonus-span" id="str_bonus" data-parent="str">0</span><br>
+                </div>
+                <div class="base-stats-line">
+                    <label class="base-stats-label" for="dex">Dexterity:</label>
+                    <input type="number" id="dex" class="base-stats-field num-field" value="10" oninput="updateValues()"> 
+                    <span class="base-stats-span">Ability Bonus: </span>
+                    <span class="bonus-span" id="dex_bonus" data-parent="dex">0</span><br>
+                </div>
+                <div class="base-stats-line">
+                    <label class="base-stats-label" for="con">Constitution:</label>
+                    <input type="number" id="con" class="base-stats-field num-field" value="10" oninput="updateValues()">
+                    <span class="base-stats-span">Ability Bonus: </span>
+                    <span class="bonus-span" id="con_bonus" data-parent="con">0</span><br>
+                </div>
+                <div class="base-stats-line">
+                    <label class="base-stats-label" for="int">Intelligence:</label>
+                    <input type="number" id="int" class="base-stats-field num-field" value="10" oninput="updateValues()">
+                    <span class="base-stats-span">Ability Bonus: </span>
+                    <span class="bonus-span" id="int_bonus" data-parent="int">0</span><br>
+                </div>
+                <div class="base-stats-line">
+                    <label class="base-stats-label" for="wis">Wisdom:</label>
+                    <input type="number" id="wis" class="base-stats-field num-field" value="10" oninput="updateValues()">
+                    <span class="base-stats-span">Ability Bonus: </span>
+                    <span class="bonus-span" id="wis_bonus" data-parent="wis">0</span><br>
+                </div>
+                <div class="base-stats-line">
+                    <label class="base-stats-label" for="chr">Charisma:</label>
+                    <input type="number" id="chr" class="base-stats-field num-field" value="10" oninput="updateValues()">
+                    <span class="base-stats-span">Ability Bonus: </span>
+                    <span class="bonus-span" id="chr_bonus" data-parent="chr">0</span><br>
+                </div>
+            </form>
+            <h4>Other Stats</h4>
+            <div class="subercontainer">
+                <span class="base-stats-label">Armor Class: </span>
+                <span id="arm_cls">TODO</span>
+            </div>
+            <div class="subercontainer">
+                <span class="base-stats-label">Initiative: </span>
+                <span id="init_bonus">+0</span>
+            </div>
+            <div class="subercontainer">
+                <span class="base-stats-label">Speed: </span>
+                <input type="number" class="speed-field num-field" id="char_speed" value="30">
+            </div>
+        </div>
+        <div class="subcontainer">
+            <h4>Proficiencies</h4>
+            <div class="subercontainer">
+                <span class="prof-mod-span">Proficiency bonus: </span> <span class="ns-bonus-span" id="prof_bonus">+2</span>
+            </div>
+            <form>
+                <div class="prof-line">
+                    <input type="checkbox" id="acr" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="acr">Acrobatics:</label>
+                    <span class="bonus-span" id="acr_bonus" data-parent="dex">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="ani" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="ani">Animal Handling:</label>
+                    <span class="bonus-span" id="ani_bonus" data-parent="wis">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="arc" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="arc">Arcana:</label>
+                    <span class="bonus-span" id="arc_bonus" data-parent="int">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="ath" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="ath">Athletics:</label>
+                    <span class="bonus-span" id="ath_bonus" data-parent="str">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="dec" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="dec">Deception:</label>
+                    <span class="bonus-span" id="dec_bonus" data-parent="chr">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="his" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="his">History:</label>
+                    <span class="bonus-span" id="his_bonus" data-parent="int">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="ins" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="ins">Insight:</label>
+                    <span class="bonus-span" id="ins_bonus" data-parent="wis">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="itm" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="itm">Intimidation:</label>
+                    <span class="bonus-span" id="itm_bonus" data-parent="chr">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="inv" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="inv">Investigation:</label>
+                    <span class="bonus-span" id="inv_bonus" data-parent="int">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="med" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="med">Medicine:</label>
+                    <span class="bonus-span" id="med_bonus" data-parent="wis">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="ntr" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="ntr">Nature:</label>
+                    <span class="bonus-span" id="ntr_bonus" data-parent="int">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="prc" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="prc">Perception:</label>
+                    <span class="bonus-span" id="prc_bonus" data-parent="wis">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="prf" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="prf">Performance:</label>
+                    <span class="bonus-span" id="prf_bonus" data-parent="chr">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="prs" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="prs">Persuasion:</label>
+                    <span class="bonus-span" id="prs_bonus" data-parent="chr">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="rel" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="rel">Religion:</label>
+                    <span class="bonus-span" id="rel_bonus" data-parent="int">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="slg" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="slg">Sleight of Hand:</label>
+                    <span class="bonus-span" id="slg_bonus" data-parent="dex">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="stl" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="stl">Stealth:</label>
+                    <span class="bonus-span" id="stl_bonus" data-parent="dex">0</span><br>
+                </div>
+                <div class="prof-line">
+                    <input type="checkbox" id="sur" class="prof-checkbox" oninput='updateValues()'>
+                    <label class="prof-label" for="sur">Survival:</label>
+                    <span class="bonus-span" id="sur_bonus" data-parent="wis">0</span><br>
+                </div>
+            </form>
+            <h4>Other</h4>
+        </div>
+        <div class="subcontainer">
+            <h4>Spells&Attacks</h4>
+        </div>
+    </div>
+</body>
+</html>
