@@ -176,8 +176,6 @@ function setHP(bool,max = false){
         hpSpan.textContent=hpSpan.textContent.replace(/^[^\/]*/, cur_hp )
     }
     hpInput.value = "1"
-    console.log(cur_hp)
-    console.log(max_hp)
     setBarWidth('healtBar', cur_hp, max_hp)
 
 }
@@ -185,7 +183,6 @@ function setHP(bool,max = false){
 function handleDeath(){
     var oldDiv = document.getElementById('healtDiv')
     divHolder = oldDiv
-
     const newDiv = document.createElement('div');
     newDiv.className = 'subcontainer';
     newDiv.id = 'deathDiv';
@@ -196,9 +193,17 @@ function handleDeath(){
         <div class="subercontainer">
             <span>TODO TO DO TO DO</span>
         </div>
+        <div class="subercontainer">
+            <button onclick="resurrection()">Revival</button>
+        </div>
     `;
-
-    // Znajdź rodzica starego diva i zastąp go nowym divem
     oldDiv.parentNode.replaceChild(newDiv, oldDiv)
+}
 
+function resurrection(){
+    var oldDiv = document.getElementById('deathDiv')
+    oldDiv.parentNode.replaceChild(divHolder, oldDiv)
+    var hpSpan = document.getElementById('healtText')
+    hpSpan.textContent = hpSpan.textContent.replace(/^[^\/]*/,"1")
+    setHP(false,true)
 }
