@@ -75,8 +75,6 @@ function countBonus(element){
 }
 
 function updateValues() {
-    //console.log('executed updateValues')
-
     var toValidate = document.getElementsByClassName("base-stats-field");
     Array.from(toValidate).forEach(elmt => validateBaseStat(elmt));
 
@@ -192,19 +190,19 @@ function handleDeath(){
         </div>
         <div class="subercontainer">
             <span class=deathDivSpan>SUCCESSES: </span>
-            <div class="circle" id="death_s1"></div>
-            <div class="circle" id="death_s2"></div>
-            <div class="circle" id="death_s3"></div>
+            <div class="death_circle death_s" id="death_s1"></div>
+            <div class="death_circle death_s" id="death_s2"></div>
+            <div class="death_circle death_s" id="death_s3"></div>
         </div>
         <div class="subercontainer">
             <span class=deathDivSpan> FAILURES: </span>
-            <div class="circle" id="death_f1"></div>
-            <div class="circle" id="death_f2"></div>
-            <div class="circle" id="death_f3"></div>
+            <div class="death_circle death_f" id="death_f1"></div>
+            <div class="death_circle death_f" id="death_f2"></div>
+            <div class="death_circle death_f" id="death_f3"></div>
         </div>
         <div class="subercontainer">
-            <button onclick="alert('prace trwaja...')">Success</button>
-            <button onclick="alert('prace trwaja...')">Failure</button>
+            <button onclick="death_throw('death_s', 'green')">Success</button>
+            <button onclick="death_throw('death_f', 'red')">Failure</button>
             <button onclick="resurrection()">Revival</button>
         </div>
     `;
@@ -217,4 +215,21 @@ function resurrection(){
     var hpSpan = document.getElementById('healtText')
     hpSpan.textContent = hpSpan.textContent.replace(/^[^\/]*/,"1")
     setHP(false,true)
+}
+
+function death_throw(class_name, color){
+    var circles = document.getElementsByClassName(class_name);
+    for (let i = 0; i < circles.length; i++) {
+        if (circles[i].style.backgroundColor == "") {
+            circles[i].style.backgroundColor = color
+            if(i<2){
+                return;
+            }
+        }
+    }
+    if(color == 'green'){
+        resurrection()
+    }else{
+        alert('UMARŁEŚ :(')
+    }
 }

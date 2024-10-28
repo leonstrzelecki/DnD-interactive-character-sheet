@@ -114,7 +114,7 @@
     z-index: 2; /* Umieszczenie tekstu na wierzchu wszystkich elementów */
 }
 
-.circle {
+.death_circle {
     width: 20px;
     height: 20px;
     border-radius: 50%;
