@@ -1,0 +1,115 @@
+.container {
+    display: flex;
+    justify-content: left;
+    align-items: flex-start;
+    padding-top: 20px;
+    min-width: 1200px;
+}
+
+.subcontainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-start; 
+}
+
+.subercontainer {
+    display: flex; /* Ustawia elementy w jednej linii */
+    margin-bottom: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.num-field{
+    /*-moz-appearance: textfield;*/ /* Firefox */
+    margin-right: 10px;
+}
+.num-field::-webkit-outer-spin-button,
+.num-field::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* Chrome, Safari, Edge, Opera */
+    margin: 0;
+}
+
+.base-stats-field {
+    width: 20px;
+}
+.hp-field{
+    width: 30px;
+}
+.exp-field {
+    width: 100px;  
+}
+
+
+.speed-field {
+    width: 20px;
+}
+
+.base-stats-label {
+    width: 90px;
+    display: inline-block;
+}
+.prof-label {
+    width: 130px;
+    display: inline-block;
+}
+
+.prof-mod-span{
+    width: 154px;
+    display: inline-block;
+}
+.base-stats-span {
+    width: 100px;
+    display: inline-block;
+}
+
+.base-stats-line{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.base-stats-line{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.progress-container {
+    width: 150px;
+    height: 18px;
+    background-color: #2d2d2d; /* Ciemniejszy kolor */
+    border-radius: 9px; /* Zaokrąglone rogi */
+    overflow: hidden;
+    position: relative; /* Ustawienie relatywne dla pozycjonowania absolutnego elementów wewnątrz */
+    display: inline-block; /* Ustawienie elementu obok */
+    vertical-align: middle;
+}
+.xp-container {
+    margin-left: 20px;
+}
+
+.progress-bar {
+    height: 100%;
+    transition: width 0.3s;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* Umieszczenie paska postępu pod spanem */
+}
+
+.hp-bar{
+    background-color: #4caf50; /* Zielony kolor paska postępu */
+    width: 100%;
+}
+.xp-bar{
+    background-color: #2c42a2;
+    width: 0%; 
+}
+
+.progress-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 18px; /* Centrowanie tekstu w pionie */
+    color: white;
+    z-index: 2; /* Umieszczenie tekstu na wierzchu wszystkich elementów */
+}
