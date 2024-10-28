@@ -188,12 +188,23 @@ function handleDeath(){
     newDiv.id = 'deathDiv';
     newDiv.innerHTML = `
         <div class="subercontainer">
-            <span>YOU ARE unconscious</span>
+            <span>YOU ARE UNCONSCIOUS</span>
         </div>
         <div class="subercontainer">
-            <span>TODO TO DO TO DO</span>
+            <span class=deathDivSpan>SUCCESSES: </span>
+            <div class="circle" id="death_s1"></div>
+            <div class="circle" id="death_s2"></div>
+            <div class="circle" id="death_s3"></div>
         </div>
         <div class="subercontainer">
+            <span class=deathDivSpan> FAILURES: </span>
+            <div class="circle" id="death_f1"></div>
+            <div class="circle" id="death_f2"></div>
+            <div class="circle" id="death_f3"></div>
+        </div>
+        <div class="subercontainer">
+            <button onclick="alert('prace trwaja...')">Success</button>
+            <button onclick="alert('prace trwaja...')">Failure</button>
             <button onclick="resurrection()">Revival</button>
         </div>
     `;
