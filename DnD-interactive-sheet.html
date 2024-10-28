@@ -95,7 +95,6 @@
 
         .progress-bar {
             height: 100%;
-            width: 0%;
             transition: width 0.3s;
             position: absolute;
             top: 0;
@@ -105,9 +104,11 @@
 
         .hp-bar{
             background-color: #4caf50; /* Zielony kolor paska postępu */
+            width: 100%;
         }
         .xp-bar{
-            background-color: #2c42a2; 
+            background-color: #2c42a2;
+            width: 0%; 
         }
 
         .progress-text {
@@ -166,6 +167,7 @@
             
             var maxHP = baseHP + cur_lvl *(incrHP + con_bonus) - incrHP
             hpSpan.textContent = hpSpan.textContent.replace(/\/.*$/, "/" + maxHP)
+            setHP(false,true)
         }
 
         function countProf(){
@@ -220,6 +222,10 @@
             URL.revokeObjectURL(url);
         }
 
+        function loadJSON(){
+            alert('Prace trwają...')
+        }
+
         function addXP(){
             var lvl_span = document.getElementById('char_lvl');
             var prg_txt = document.getElementById('progressText');
@@ -257,14 +263,18 @@
             }     
         }
         
-        function addHP(bool,max = false){
+        function setHP(bool,max = false){
             var hpSpan = document.getElementById('healtText')
             var cur_hp = parseInt(hpSpan.textContent.split("/")[0])
             var max_hp = parseInt(hpSpan.textContent.split("/")[1])
             var hpInput = document.getElementById('hp-input')
             var hpValue = hpInput.value
             if (max == true){
-                hpValue = max_hp
+                if (bool == true){
+                    hpValue = max_hp
+                }else{
+                    hpValue = 0
+                }
             }
             else if (bool==false){
                 hpValue = -hpValue
@@ -280,8 +290,12 @@
             else if(cur_hp > max_hp){
                 cur_hp = max_hp
             }
-            hpSpan.textContent=hpSpan.textContent.replace(/^[^\/]*/, cur_hp )
+            if (bool != false || max != true){
+                hpSpan.textContent=hpSpan.textContent.replace(/^[^\/]*/, cur_hp )
+            }
             hpInput.value = "1"
+            console.log(cur_hp)
+            console.log(max_hp)
             setBarWidth('healtBar', cur_hp, max_hp)
 
         }
@@ -321,7 +335,7 @@
             </div>
             <div class="subercontainer">
                 <button onclick="saveToJSON()">Save</button>
-                <button >Load</button>
+                <button onclick="loadJSON()">Load</button>
             </div>
         </div>
         <div class="subcontainer">
@@ -348,14 +362,14 @@
             <div class="subercontainer">
                 <div class="progress-container">
                     <div class="progress-bar hp-bar" id="healtBar"></div>
-                    <span class="progress-text" id="healtText">0/300</span>
+                    <span class="progress-text" id="healtText">12/12</span>
                 </div>
             </div>
             <div class="subercontainer">
                 <input type="number" id="hp-input" class="hp-field num-field" value="1">
-                <button onclick="addHP(false)">DMG</button>
-                <button onclick="addHP(true)">HEAL</button>
-                <button onclick="addHP(true,true)">MAX</button>
+                <button onclick="setHP(false)">DMG</button>
+                <button onclick="setHP(true)">HEAL</button>
+                <button onclick="setHP(true,true)">MAX</button>
             </div>
         </div>
     </div>
