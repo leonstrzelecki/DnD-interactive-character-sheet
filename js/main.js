@@ -38,6 +38,8 @@ const classProp = {
     wiz: [6, 4]     // Wizard
 }
 
+var divHolder = document.createElement('div')
+
 function countMaxHP(classId){
     var baseHP = classProp[classId][0] 
     var incrHP = classProp[classId][1]
@@ -165,7 +167,7 @@ function setHP(bool,max = false){
         alert("umarłeś")
     }
     else if(cur_hp <=0){
-        alert("TODO WALKA O ŻYCIE")
+        handleDeath()
     }
     else if(cur_hp > max_hp){
         cur_hp = max_hp
@@ -177,5 +179,26 @@ function setHP(bool,max = false){
     console.log(cur_hp)
     console.log(max_hp)
     setBarWidth('healtBar', cur_hp, max_hp)
+
+}
+
+function handleDeath(){
+    var oldDiv = document.getElementById('healtDiv')
+    divHolder = oldDiv
+
+    const newDiv = document.createElement('div');
+    newDiv.className = 'subcontainer';
+    newDiv.id = 'deathDiv';
+    newDiv.innerHTML = `
+        <div class="subercontainer">
+            <span>YOU ARE unconscious</span>
+        </div>
+        <div class="subercontainer">
+            <span>TODO TO DO TO DO</span>
+        </div>
+    `;
+
+    // Znajdź rodzica starego diva i zastąp go nowym divem
+    oldDiv.parentNode.replaceChild(newDiv, oldDiv)
 
 }
