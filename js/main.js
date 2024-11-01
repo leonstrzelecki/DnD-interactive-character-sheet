@@ -100,6 +100,7 @@ function saveToJSON() {
     a.download = export_content.char_name + "_save.json";
     a.click();
     URL.revokeObjectURL(url);
+    alert('funkcjonalność nie skończona... Prace trwają...')
 }
 
 function loadJSON(){
