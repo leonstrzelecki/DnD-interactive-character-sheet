@@ -39,6 +39,7 @@ const classProp = {
 }
 
 var divHolder = document.createElement('div')
+var closeHolder = document.get
 
 function countMaxHP(classId){
     var baseHP = classProp[classId][0] 
@@ -235,6 +236,13 @@ function death_throw(class_name, color){
     }
 }
 
-function addAttack(){
-    alert('Prace Trwają...')
+function showPopup(id){
+    var popup = document.getElementById(id)
+    popup.style.display = "block"
+    alert('Prace trwają...')
+}
+
+function hidePopup(id){
+    var popup = document.getElementById(id)
+    popup.style.display = "none"
 }
