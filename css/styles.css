@@ -17,7 +17,7 @@
     display: flex; /* Ustawia elementy w jednej linii */
     margin-bottom: 10px;
     align-items: center;
-    justify-content: center;
+    width: 100%;
 }
 
 .num-field{
@@ -133,6 +133,6 @@
     margin-top: 10px;
     margin-bottom: 10px;
     margin-left: 0;
-    margin-right: 0;
+    margin-right: 25%;
     line-height: 1.2; 
 }

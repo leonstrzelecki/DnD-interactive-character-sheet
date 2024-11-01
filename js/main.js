@@ -234,3 +234,7 @@ function death_throw(class_name, color){
         alert('UMARŁEŚ :(')
     }
 }
+
+function addAttack(){
+    alert('Prace Trwają...')
+}
